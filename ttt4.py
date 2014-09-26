@@ -12,6 +12,7 @@
 import sys
 import numpy
 test_str = '.....XO..OX.....'
+board_map = {}
 
 def fail (msg):
     raise StandardError(msg)
@@ -27,7 +28,21 @@ def create_board (string):
     #   each either X or O, or . to represent a free space
     # It is allowed to pass in a string describing a board
     #   that would never arise in legal play starting from an empty board
-    return None
+
+    rows = []
+    for i in range(0,len(string),4):
+        y = (i/4)+1
+        row_string = string[i:i+4]
+        rows.append(row_string)
+        for j in range(0,len(row_string)):
+            x = j+1
+            coord = (x,y)
+            board_map[coord] = row_string[j]
+    return rows
+
+
+
+    #return None
 
 
 def has_mark (board,x,y):
@@ -55,13 +70,11 @@ def done (board):
 
 
 def print_board (board):
-     # FIX ME
+    # FIX ME
     #
     # Display a board on the console
-
     for i in board:
-        print i
-
+        print '  ',board[i],board[i+1],board[i+2],board[i+3]
     return None
 
 def read_player_input (board, player):
@@ -119,7 +132,7 @@ def run (str,player,playX,playO):
         print 'Draw'
         
 def main ():
-    run('.' * 16, 'X', read_player_input, computer_move)
+    run(test_str, 'X', read_player_input, computer_move)
 
 
 PLAYER_MAP = {
@@ -139,7 +152,8 @@ PLAYER_MAP = {
 #     exit(1)
 #   run(test_str,player,playX,playO)
 
+# create_board(test_str)
+#main()
 create_board(test_str)
-
 
 
