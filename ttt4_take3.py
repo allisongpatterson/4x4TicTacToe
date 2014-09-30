@@ -12,6 +12,8 @@
 import sys
 testString = '.....XO..OX.....'
 size = 4
+player = 'X'
+
 WIN_SEQUENCES = [
     [1,2,3,4],
     [5,6,7,8],
@@ -33,15 +35,18 @@ MARK_VALUE = {
 
 class board(object):
     def __init__(self, boardString):
-        self.boardList = boardString
+        self.boardList = []
+        for i in range(0,len(boardString)):
+        #self.boardList = [boardString]
+            self.boardList.append(boardString[i])
 
     def valueOfCoordinate(self,x,y):
         value = self.boardList[(x-1) + size*(y-1)]
         return value
 
     def indexOfCoordinate(self,x,y):
-        index = (x-1)+size*(y-1)
-        return index
+        index = (int(x)-1)+size*(int(y)-1)
+        return int(index)
 
 # def fail (msg):
 #     raise StandardError(msg)
@@ -125,11 +130,13 @@ def read_player_input (board, player):
     # return None
 
     while True:
-        move = raw_input#('Enter row,column (ex: 2,3) to make move.')
+        move = str(raw_input)#('Enter row,column (ex: 2,3) to make move.')
+        x = int(move[0])
+        y = int(move[2])
         if move == 'q':
             exit(0)
-        if has_mark(board,move[0],move[1]) == False:
-            print int(move[0]),int(move[1])
+        if has_mark(board,x,y) == False:
+            return int(move[0]),int(move[2])
 
 def make_move (board,move,player):
     # FIX ME
@@ -139,14 +146,13 @@ def make_move (board,move,player):
     # Change can be done in place in 'board' or a new copy created
     # return None
 
-    moveSpace = board.indexOfCoordinate(move[0],move[1])
-    newBoard = board.boardList[:]
-    board.boardList[moveSpace] = player
+    x = int(move[0])
+    y = int(move[2])
+    i = int(board.indexOfCoordinate(x,y))
+    board.boardList[i] = player
+    newList = board.boardList[:i],board.boardList[i],board.boardList[i+1:]
+    board.boardList = ''.join(c for c in board.boardList)
     return board.boardList
-
-    # new_board = board.boardList[:]
-    # new_board[move] = player
-    # return new_board
 
 def computer_move (board,player):
     # FIX ME
@@ -209,8 +215,11 @@ PLAYER_MAP = {
 #   run(testString,player,playX,playO)
 
 board = board(testString)
-print board.valueOfCoordinate(2,3)
-print has_mark(board,2,3)
+# print board.valueOfCoordinate(2,3)
+# print has_mark(board,2,3)
+# print board.valueOfCoordinate(1,1)
+# print has_mark(board,1,1)
 print_board(board)
-a = 1,1
-print make_move(board,a,'X')
+move = '4,4'
+print make_move(board,move,player)
+print_board(board)
