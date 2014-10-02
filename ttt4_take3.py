@@ -10,9 +10,11 @@
 #
 
 import sys
-testString = '.....XO..OX.....'
+import copy
+
+testString = 'XOXOXOXOX.X.O...'
 size = 4
-player = 'X'
+#player = 'X'
 
 WIN_SEQUENCES = [
     [1,2,3,4],
@@ -39,6 +41,7 @@ class board(object):
         for i in range(0,len(boardString)):
         #self.boardList = [boardString]
             self.boardList.append(boardString[i])
+        # print self.boardList
 
     def valueOfCoordinate(self,x,y):
         value = self.boardList[(x-1) + size*(y-1)]
@@ -47,6 +50,15 @@ class board(object):
     def indexOfCoordinate(self,x,y):
         index = (int(x)-1)+size*(int(y)-1)
         return int(index)
+
+    def coordinateOfIndex(self,index):
+        y = index/size
+        x = index-(y*size)
+        coord = str(x+1)+','+str(y+1)
+        return coord
+        # print coord[0]
+        # print coord[1]
+        # print str(coord[0])+','+str(coord[1])
 
 # def fail (msg):
 #     raise StandardError(msg)
@@ -65,8 +77,8 @@ def create_board (boardString):
     #   board
     # return None
 
-    board = board(testString)
-    return board
+    board1 = board(boardString)
+    return board1
 
 def has_mark (board,x,y):
     # FIX ME
@@ -91,7 +103,7 @@ def has_win (board):
     # return None
 
     for positions in WIN_SEQUENCES:
-        s = sum(MARK_VALUE[board[pos]] for pos in positions)
+        s = sum(MARK_VALUE[board.boardList[pos-1]] for pos in positions)
         if s == 4:
             return 'O'
         if s == 40:
@@ -106,7 +118,7 @@ def done (board):
 
     if has_win(board) != False:
         return True
-    elif has_win(board) == False:
+    else:
         for i in range(0,len(board.boardList)):
             if board.boardList[i] == '.':
                 return False
@@ -130,13 +142,14 @@ def read_player_input (board, player):
     # return None
 
     while True:
-        move = str(raw_input)#('Enter row,column (ex: 2,3) to make move.')
+        move = str(raw_input('Enter row,column (ex: 2,3) to make move.'))
+        print move
         x = int(move[0])
         y = int(move[2])
         if move == 'q':
             exit(0)
         if has_mark(board,x,y) == False:
-            return int(move[0]),int(move[2])
+            return str(x) + "," + str(y) #int(move[0]),int(move[2])
 
 def make_move (board,move,player):
     # FIX ME
@@ -150,19 +163,53 @@ def make_move (board,move,player):
     y = int(move[2])
     i = int(board.indexOfCoordinate(x,y))
     board.boardList[i] = player
-    newList = board.boardList[:i],board.boardList[i],board.boardList[i+1:]
-    board.boardList = ''.join(c for c in board.boardList)
-    return board.boardList
+    # newList = board.boardList[:i],board.boardList[i],board.boardList[i+1:]
+    # board.boardList = ''.join(c for c in board.boardList)
+    # print_board(board)
+    #computer_move(board,other(player))
+    return board
 
-def computer_move (board,player):
+def minimaxSearch (board,player):
     # FIX ME
     #
     # Select a move for the computer, when playing as 'player' (either 
     #   'X' or 'O')
     # Return the selected move (a tuple (x,y) with each position between 
     #   1 and 4)
-    return None
+    # return None
 
+    win = has_win(board)
+    if win == 'X':
+        return 1
+    elif win == 'O':
+        return -1
+    elif done(board):
+        return 0
+    else:
+        valueList = []
+        for i in range(0,len(board.boardList)):
+            if board.boardList[i] == '.':
+                hypo = make_move(copy.deepcopy(board),board.coordinateOfIndex(i),player)
+                valueList.append(minimaxSearch(hypo,other(player)))
+        if player == 'X':
+            return max(valueList)
+        elif player == 'O':
+            return min(valueList)
+
+def computer_move (board,player):
+    bestMove = (-1,None)
+    for i in range(0,len(board.boardList)):
+        if board.boardList[i] == '.':
+            hypo = make_move(copy.deepcopy(board),board.coordinateOfIndex(i),player)
+            value = minimaxSearch(hypo,other(player))
+            if bestMove[1] == None:
+                bestMove = (i,value)
+            elif player == 'X' and value>bestMove[1]:
+                bestMove = (i,value)
+            elif player =='O' and value<bestMove[1]:
+                bestMove = (i,value)
+            print "move " + str(i) + " examined"
+    return board.coordinateOfIndex(bestMove[0])
 
 def other (player):
     if player == 'X':
@@ -170,24 +217,24 @@ def other (player):
     return 'X'
 
 
-def run (str,player,playX,playO): 
+def run (boardString,player,playX,playO): 
 
-    board = create_board(str)
+    board1 = create_board(boardString)
 
-    print_board(board)
+    print_board(board1)
 
-    while not done(board):
+    while not done(board1):
         if player == 'X':
-            move = playX(board,player)
+            move = playX(board1,player)
         elif player == 'O':
-            move = playO(board,player)
+            move = playO(board1,player)
         else:
             fail('Unrecognized player '+player)
-        board = make_move(board,move,player)
-        print_board(board)
+        board1 = make_move(board1,move,player)
+        print_board(board1)
         player = other(player)
 
-    winner = has_win(board)
+    winner = has_win(board1)
     if winner:
         print winner,'wins!'
     else:
@@ -214,12 +261,16 @@ PLAYER_MAP = {
 #     exit(1)
 #   run(testString,player,playX,playO)
 
-board = board(testString)
+# board = board(testString)
+# print_board(board)
 # print board.valueOfCoordinate(2,3)
 # print has_mark(board,2,3)
 # print board.valueOfCoordinate(1,1)
 # print has_mark(board,1,1)
-print_board(board)
-move = '4,4'
-print make_move(board,move,player)
-print_board(board)
+# board.boardList[15] = 'X'
+# print_board(board)
+# move = '4,4'
+# make_move(board,move,'X')
+# computer_move(board,'O')
+# print_board(board)
+run('.OOXXXOOXXXO....', 'X',  computer_move, read_player_input)
