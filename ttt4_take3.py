@@ -11,10 +11,10 @@
 
 import sys
 import copy
+import ttt4_graphics
 
 testString = 'XOXOXOXOX.X.O...'
 size = 4
-#player = 'X'
 
 WIN_SEQUENCES = [
     [1,2,3,4],
@@ -41,7 +41,7 @@ class board(object):
         for i in range(0,len(boardString)):
         #self.boardList = [boardString]
             self.boardList.append(boardString[i])
-        # print self.boardList
+        print self.boardList
 
     def valueOfCoordinate(self,x,y):
         value = self.boardList[(x-1) + size*(y-1)]
@@ -76,9 +76,15 @@ def create_board (boardString):
     #   that would never arise in legal play starting from an empty
     #   board
     # return None
-
+    
     board1 = board(boardString)
+    ttt4_graphics.create_grid()
+    for i in range(0,len(board1.boardList)):
+        coord = board.coordinateOfIndex(board1,i)
+        ttt4_graphics.display_mark(int(coord[0]),int(coord[2]),board.valueOfCoordinate(board1,int(coord[0]),int(coord[2])))
+
     return board1
+
 
 def has_mark (board,x,y):
     # FIX ME
@@ -134,22 +140,28 @@ def print_board (board):
         print ' ',board.boardList[i*4],board.boardList[i*4+1],board.boardList[i*4+2],board.boardList[i*4+3]
     print
 
+
 def read_player_input (board, player):
     # FIX ME
     #
     # Read player input when playing as 'player' (either 'X' or 'O')
     # Return a move (a tuple (x,y) with each position between 1 and 4)
     # return None
+    x,y = ttt4_graphics.get_click()
+    if has_mark(board,x,y) == False:
+        move = str(x)+','+str(y)
+        make_move(board,move,player)
 
-    while True:
-        move = str(raw_input('Enter row,column (ex: 2,3) to make move.'))
-        print move
-        x = int(move[0])
-        y = int(move[2])
-        if move == 'q':
-            exit(0)
-        if has_mark(board,x,y) == False:
-            return str(x) + "," + str(y) #int(move[0]),int(move[2])
+
+    # while True:
+    #     move = str(raw_input('Enter row,column (ex: 2,3) to make move.'))
+    #     print move
+    #     x = int(move[0])
+    #     y = int(move[2])
+    #     if move == 'q':
+    #         exit(0)
+    #     if has_mark(board,x,y) == False:
+    #         return str(x) + "," + str(y) #int(move[0]),int(move[2])
 
 def make_move (board,move,player):
     # FIX ME
@@ -162,6 +174,8 @@ def make_move (board,move,player):
     x = int(move[0])
     y = int(move[2])
     i = int(board.indexOfCoordinate(x,y))
+
+    ttt4_graphics.display_mark(x,y,player)
     board.boardList[i] = player
     # newList = board.boardList[:i],board.boardList[i],board.boardList[i+1:]
     # board.boardList = ''.join(c for c in board.boardList)
@@ -209,6 +223,7 @@ def computer_move (board,player):
             elif player =='O' and value<bestMove[1]:
                 bestMove = (i,value)
             print "move " + str(i) + " examined"
+    ttt4_graphics.display_mark(board.coordinateOfIndex(bestMove[0]),board.coordinateOfIndex(bestMove[2]),player)
     return board.coordinateOfIndex(bestMove[0])
 
 def other (player):
@@ -218,7 +233,6 @@ def other (player):
 
 
 def run (boardString,player,playX,playO): 
-
     board1 = create_board(boardString)
 
     print_board(board1)
@@ -273,4 +287,5 @@ PLAYER_MAP = {
 # make_move(board,move,'X')
 # computer_move(board,'O')
 # print_board(board)
+
 run('.OOXXXOOXXXO....', 'X',  computer_move, read_player_input)
