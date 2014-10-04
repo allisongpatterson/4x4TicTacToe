@@ -13,7 +13,6 @@ import sys
 import copy
 import ttt4_graphics
 
-testString = 'XOXOXOXOX.X.O...'
 size = 4
 
 WIN_SEQUENCES = [
@@ -175,6 +174,7 @@ def minimaxSearch (board,player):
             return min(valueList)
 
 def computer_move (board,player):
+    
     bestMove = (-1,None)
     for i in range(0,len(board.boardList)):
         if board.boardList[i] == '.':
@@ -197,6 +197,9 @@ def other (player):
 
 
 def run (boardString,player,playX,playO): 
+
+    ttt4_graphics.create_grid()
+
     board1 = create_board(boardString)
 
     print_board(board1)
@@ -225,5 +228,5 @@ PLAYER_MAP = {
 
 if __name__ == '__main__':
 
-    run('.OOXXXOOXXXO....', 'X', computer_move, read_player_input)
+    run('X.OO.XOOXX.O....', 'X', computer_move, read_player_input)
     ttt4_graphics.win.getMouse()
