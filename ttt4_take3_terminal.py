@@ -12,7 +12,6 @@
 import sys
 import copy
 
-testString = 'XOXOXOXOX.X.O...'
 size = 4
 
 WIN_SEQUENCES = [
@@ -225,26 +224,12 @@ def run (boardString,player,playX,playO):
         print winner,'wins!'
     else:
         print 'Draw'
-        
-def main ():
-    run('.' * 16, 'X', read_player_input, computer_move)
-
 
 PLAYER_MAP = {
     'human': read_player_input,
     'computer': computer_move
 }
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-#   try:
-#       #str = sys.argv[1] if len(sys.argv)>1 else '.' * 16
-#       player = sys.argv[2] if len(sys.argv)>3 else 'X'
-#       playX = PLAYER_MAP[sys.argv[3]] if len(sys.argv)>3 else read_player_input
-#       playO = PLAYER_MAP[sys.argv[4]] if len(sys.argv)>4 else computer_move
-#   except:
-#     print 'Usage: %s [starting board] [X|O] [human|computer] [human|computer]' % (sys.argv[0])
-#     exit(1)
-#   run(testString,player,playX,playO)
-
-run('.OOXXXOOXXXO....', 'X', read_player_input, computer_move)
+    run('X.OO.XOOXX.O....', 'X', computer_move, read_player_input)
